@@ -5,6 +5,9 @@
 
 #include "errorcodes.h"
 
+HttpApp::HttpApp(int &argc, char *argv[]) : QCoreApplication(argc, argv) {
+};
+
 void HttpApp::getJsonData(QString jsonData) {
 
   std::cout << ">>> " << jsonData.toAscii().data();

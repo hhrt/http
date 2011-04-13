@@ -8,7 +8,7 @@ class HttpApp : public QCoreApplication {
 Q_OBJECT
 
   public:
-  HttpApp(int argc, char *argv[]) : QCoreApplication(argc,argv) {}; 
+  HttpApp(int &argc, char *argv[]); 
   public slots:
   void getJsonData(QString jsonData);
   void closeApp(int errorCode);

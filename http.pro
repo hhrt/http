@@ -20,3 +20,5 @@ mac {
 MOC_DIR = ../tmp
 DESTDIR = ../out
 OBJECTS_DIR = ../tmp
+
+CONFIG += debug

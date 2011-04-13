@@ -31,7 +31,7 @@ bool HttpPoster::setConnectionSettings(QString host, QString port) {
   }
   jsonRequest = requestFile.readAll();
   
-  http->setHost("127.0.0.1", 9091);
+  http->setHost(host, port.toInt());
 
   if(debug) qDebug() << "******* Request body: ********\n" << jsonRequest.data();
 
@@ -51,7 +51,7 @@ bool HttpPoster::sendRequest() {
 
 void HttpPoster::dataRecieved(bool error) {
   if(error) { 
-	if(debug) qDebug() << "Error recieving data!" << "\n";
+	if(debug) qDebug() << "Error recieving data!" << http->errorString();
 	emit httpPostError(dataRecievingError);
   }
   else {  
