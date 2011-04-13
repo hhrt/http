@@ -16,3 +16,7 @@ QT += network
 mac {
     CONFIG -= app_bundle
 }
+
+MOC_DIR = ../tmp
+DESTDIR = ../out
+OBJECTS_DIR = ../tmp

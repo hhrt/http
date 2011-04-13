@@ -17,10 +17,10 @@ HttpPoster::HttpPoster( bool dbg = false)
 
 };
 
-bool HttpPoster::setConnectionSettings() {
+bool HttpPoster::setConnectionSettings(QString host, QString port) {
 
   requestHeader.setRequest("POST", "/transmission/rpc");
-  requestHeader.setValue("Host", "127.0.0.1");
+  requestHeader.setValue(host, port);
 
   QFile requestFile(jsonRequestFileName);
   if(!requestFile.open(QIODevice::ReadOnly | QIODevice::Text)) {

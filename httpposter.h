@@ -16,7 +16,7 @@ class HttpPoster : public QObject
 
   public:
   HttpPoster( bool dbg );
-  bool setConnectionSettings();
+  bool setConnectionSettings(QString host = "127.0.0.1", QString port = "80");
   bool sendRequest();
 
   private:
