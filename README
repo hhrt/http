@@ -1,1 +1,6 @@
 This project needs ljson_linux-gcc-4.4.3_libmt .
+
+Library must be compiled for current architecture.
+On macosx may be needed to change location stttings:
+	install_name_tool -id @executable_path</path/to/lib> </path/to/lib>
+
