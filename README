@@ -4,3 +4,5 @@ Library must be compiled for current architecture.
 On macosx may be needed to change location stttings:
 	install_name_tool -id @executable_path</path/to/lib> </path/to/lib>
 
+25/04/2011 - 17:43
+The jsoncpp library is included directly in this project.

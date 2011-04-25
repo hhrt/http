@@ -8,8 +8,8 @@ DEPENDPATH += .
 INCLUDEPATH += .
 
 # Input
-HEADERS += errorcodes.h httpapp.h httpposter.h
-SOURCES += httpapp.cpp httpposter.cpp main.cpp
+HEADERS += errorcodes.h httpapp.h httpposter.h ./include/json/*.h
+SOURCES += httpapp.cpp httpposter.cpp main.cpp ./lib/*.cpp
 
 QT += network
 
@@ -23,6 +23,3 @@ OBJECTS_DIR = ../tmp
 
 CONFIG += debug
 
-INCLUDEPATH = ../../include/
-LIBS += -L/Users/mac/work/libs
-LIBS += -ljson_linux-gcc-4.2.1_libmt
