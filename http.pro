@@ -23,3 +23,5 @@ OBJECTS_DIR = ../tmp
 
 CONFIG += debug
 
+#LIBS += ./lib/
+INCLUDEPATH += ./include/
