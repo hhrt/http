@@ -12,6 +12,14 @@ Torrent::Torrent() {
   Name = "";
 };
 
+Torrent::Torrent(Json::Value j) {
+
+  Id = j.get("id", "0").asUInt();
+  Size = j.get("totalSize", "0").asDouble();
+  Name = j.get("name", "").asString();
+
+}
+
 int Torrent::id() const {
   return Id;
 };

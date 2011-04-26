@@ -2,7 +2,7 @@
 #define TORRENT_H
 
 #include <string>
-
+#include <json/json.h>
 class Torrent {
 
   int Id;
@@ -11,6 +11,7 @@ class Torrent {
 
   public:
   Torrent(int i, double s, std::string n);
+  Torrent(Json::Value j);
   Torrent();
   int id() const;
   double size() const;

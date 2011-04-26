@@ -24,7 +24,7 @@ void HttpApp::getJsonData(QString jsonData) {
 
   Json::Value torrentsValue;
   torrentsValue = root["arguments"]["torrents"];
-  Torrent torrent;
+  Torrent *torrent;
 
   std::vector<Torrent> torrents;
 
@@ -32,10 +32,15 @@ void HttpApp::getJsonData(QString jsonData) {
 
   try {
     for(i=0;i<torrentsValue.size();i++) {
-      torrent.set_id(torrentsValue[i].get("id", "0").asUInt());
+     /* torrent.set_id(torrentsValue[i].get("id", "0").asUInt());
 	  torrent.set_size(torrentsValue[i].get("totalSize", "0").asDouble());
-	  torrent.set_name(torrentsValue[i].get("name", "none").asString());
-	  torrents.push_back(torrent);
+	  torrent.set_name(torrentsValue[i].get("name", "none").asString()); */
+
+      torrent = new Torrent(torrentsValue[i]);
+
+	  torrents.push_back(*torrent);
+
+	  delete torrent;
     }
   }
   catch(std::exception &e) {
