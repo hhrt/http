@@ -51,3 +51,16 @@ bool Torrent::operator==(Torrent b) {
 bool Torrent::operator<(Torrent b) {
   return Id < b.id();
 };
+
+TorrentsList::TorrentsList(std::string r, unsigned int t) {
+  Result = r;
+  Tag = t;
+};
+
+std::string TorrentsList::result() {
+  return Result;
+};
+
+unsigned int TorrentsList::tag() {
+  return Tag;
+};

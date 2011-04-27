@@ -2,7 +2,9 @@
 #define TORRENT_H
 
 #include <string>
+#include <vector>
 #include <json/json.h>
+
 class Torrent {
 
   int Id;
@@ -23,6 +25,19 @@ class Torrent {
 
   bool operator==(Torrent b);
   bool operator<(Torrent b);
+};
+
+//template <class T>
+class TorrentsList : public std::vector<Torrent> {
+
+  private:
+  std::string Result;
+  unsigned int Tag;
+  
+  public:
+  TorrentsList(std::string result, unsigned int tag);
+  std::string result();
+  unsigned int tag();
 };
 
 

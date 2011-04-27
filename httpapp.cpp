@@ -12,51 +12,43 @@ HttpApp::HttpApp(int &argc, char *argv[]) : QCoreApplication(argc, argv) {
 };
 
 void HttpApp::getJsonData(QString jsonData) {
-
-  Json::Value root;
-  Json::Reader reader;
-
-  if(!reader.parse(jsonData.toAscii().data(), root)) 
-	std::cout << "Error parsing json data!\n";
-
-  std::cout << "Result: " << root.get("result", "none").asString() << "\n";
-  std::cout << "Tag: " << root.get("tag", "0").asUInt() << "\n";
-
-  Json::Value torrentsValue;
-  torrentsValue = root["arguments"]["torrents"];
-  Torrent *torrent;
-
-  std::vector<Torrent> torrents;
-
-  unsigned int i;
-
   try {
+    Json::Value root;
+    Json::Reader reader;
+    unsigned int i;
+
+    if(!reader.parse(jsonData.toAscii().data(), root)) 
+	  std::cout << "Error parsing json data!\n";
+
+    TorrentsList torrentsList(root.get("result", "none").asString(), root.get("tag", "0").asUInt());
+
+/*    std::cout << "Result: " << root.get("result", "none").asString() << "\n";
+    std::cout << "Tag: " << root.get("tag", "0").asUInt() << "\n"; */
+
+    Json::Value torrentsValue;
+    torrentsValue = root["arguments"]["torrents"];
+    Torrent *torrent;
+
     for(i=0;i<torrentsValue.size();i++) {
-     /* torrent.set_id(torrentsValue[i].get("id", "0").asUInt());
-	  torrent.set_size(torrentsValue[i].get("totalSize", "0").asDouble());
-	  torrent.set_name(torrentsValue[i].get("name", "none").asString()); */
-
       torrent = new Torrent(torrentsValue[i]);
-
-	  torrents.push_back(*torrent);
-
+	  torrentsList.push_back(*torrent);
 	  delete torrent;
+    }
+
+    std::cout << "Result: " << torrentsList.result() << "\n";
+	std::cout << "Tag: " << torrentsList.tag() << "\n";
+    std::cout << "Torrents list(" << torrentsList.size() <<"): \n";
+
+    for(i=0;i<torrentsList.size();i++) {
+	  std::cout << "ID: " << torrentsList[i].id() << " ";
+	  std::cout << "Name: \"" << torrentsList[i].name() << "\" ";
+	  std::cout << "Total_Size: " << torrentsList[i].size() << "\n";
     }
   }
   catch(std::exception &e) {
-    std::cout << "\nError: " << e.what() << "\n";	
+	qDebug() << "\nError: " << e.what() << "\n";
   }
-
-  std::cout << "Torrents list(" << torrents.size() <<"): \n";
-
-  for(i=0;i<torrents.size();i++) {
-	std::cout << "ID: " << torrents[i].id() << " ";
-	std::cout << "Name: \"" << torrents[i].name() << "\" ";
-	std::cout << "Total_Size: " << torrents[i].size() << "\n";
-  }
-
   exit(0);
-
 };
 
 void HttpApp::closeApp(int errorCode) {
