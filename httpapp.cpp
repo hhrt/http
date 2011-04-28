@@ -41,7 +41,7 @@ void HttpApp::getJsonData(QString jsonData) {
     for(i=0;i<torrentsList.torrents()->size();i++) {
 	  std::cout << "ID: " << *(torrentsList.torrents()->at(i).id()) << " ";
 	  std::cout << "Name: \"" << *(torrentsList.torrents()->at(i).name()) << "\" ";
-	  std::cout << "Total_Size: " << *(torrentsList.torrents()->at(i).size()) << "\n";
+	  std::cout << "Total_Size: " << std::fixed << (long unsigned int)*(torrentsList.torrents()->at(i).size()) << "Bytes\n";
     }
   }
   catch(std::exception &e) {
