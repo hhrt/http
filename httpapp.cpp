@@ -20,29 +20,28 @@ void HttpApp::getJsonData(QString jsonData) {
     if(!reader.parse(jsonData.toAscii().data(), root)) 
 	  std::cout << "Error parsing json data!\n";
 
-    TorrentsList torrentsList(root.get("result", "none").asString(), root.get("tag", "0").asUInt());
-
-/*    std::cout << "Result: " << root.get("result", "none").asString() << "\n";
-    std::cout << "Tag: " << root.get("tag", "0").asUInt() << "\n"; */
-
     Json::Value torrentsValue;
     torrentsValue = root["arguments"]["torrents"];
     Torrent *torrent;
+	TorrentsList torrentsList;
+
+	*torrentsList.result() = root.get("result", "none").asString();
+	*torrentsList.tag() = root.get("tag", "0").asUInt();
 
     for(i=0;i<torrentsValue.size();i++) {
       torrent = new Torrent(torrentsValue[i]);
-	  torrentsList.push_back(*torrent);
+	  torrentsList.torrents()->push_back(*torrent);
 	  delete torrent;
     }
 
-    std::cout << "Result: " << torrentsList.result() << "\n";
-	std::cout << "Tag: " << torrentsList.tag() << "\n";
-    std::cout << "Torrents list(" << torrentsList.size() <<"): \n";
+    std::cout << "Result: " << *torrentsList.result() << "\n";
+	std::cout << "Tag: " << *torrentsList.tag() << "\n";
+    std::cout << "Torrents list(" << torrentsList.torrents()->size() <<"): \n";
 
-    for(i=0;i<torrentsList.size();i++) {
-	  std::cout << "ID: " << torrentsList[i].id() << " ";
-	  std::cout << "Name: \"" << torrentsList[i].name() << "\" ";
-	  std::cout << "Total_Size: " << torrentsList[i].size() << "\n";
+    for(i=0;i<torrentsList.torrents()->size();i++) {
+	  std::cout << "ID: " << *(torrentsList.torrents()->at(i).id()) << " ";
+	  std::cout << "Name: \"" << *(torrentsList.torrents()->at(i).name()) << "\" ";
+	  std::cout << "Total_Size: " << *(torrentsList.torrents()->at(i).size()) << "\n";
     }
   }
   catch(std::exception &e) {

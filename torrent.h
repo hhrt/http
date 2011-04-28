@@ -15,9 +15,9 @@ class Torrent {
   Torrent(int i, double s, std::string n);
   Torrent(Json::Value j);
   Torrent();
-  int id() const;
-  double size() const;
-  std::string name() const;
+  int *id();
+  double *size();
+  std::string *name();
 
   void set_id(int i);
   void set_size(double s);
@@ -28,16 +28,19 @@ class Torrent {
 };
 
 //template <class T>
-class TorrentsList : public std::vector<Torrent> {
+class TorrentsList {
 
   private:
   std::string Result;
   unsigned int Tag;
+  std::vector<Torrent> Torrents;
   
   public:
   TorrentsList(std::string result, unsigned int tag);
-  std::string result();
-  unsigned int tag();
+  TorrentsList();
+  std::string *result();
+  unsigned int *tag();
+  std::vector<Torrent> *torrents();
 };
 
 

@@ -20,16 +20,16 @@ Torrent::Torrent(Json::Value j) {
 
 }
 
-int Torrent::id() const {
-  return Id;
+int *Torrent::id(){
+  return &Id;
 };
 
-double Torrent::size() const {
-  return Size;
+double *Torrent::size(){
+  return &Size;
 };
 
-std::string Torrent::name() const {
-  return Name;
+std::string *Torrent::name(){
+  return &Name;
 };
 
 void Torrent::set_id(int i) {
@@ -45,11 +45,11 @@ void Torrent::set_name(std::string n) {
 };
 
 bool Torrent::operator==(Torrent b) {
-  return Id == b.id();
+  return Id == *b.id();
 };
 
 bool Torrent::operator<(Torrent b) {
-  return Id < b.id();
+  return Id < *b.id();
 };
 
 TorrentsList::TorrentsList(std::string r, unsigned int t) {
@@ -57,10 +57,19 @@ TorrentsList::TorrentsList(std::string r, unsigned int t) {
   Tag = t;
 };
 
-std::string TorrentsList::result() {
-  return Result;
+TorrentsList::TorrentsList() {
+  Result = "";
+  Tag = 0;
 };
 
-unsigned int TorrentsList::tag() {
-  return Tag;
+std::string *TorrentsList::result() {
+  return &Result;
+};
+
+unsigned int *TorrentsList::tag() {
+  return &Tag;
+};
+
+std::vector<Torrent> *TorrentsList::torrents() {
+  return &Torrents;
 };
