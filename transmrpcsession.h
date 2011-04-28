@@ -17,23 +17,27 @@ class TransmRpcSession : public QObject {
   Q_OBJECT
 
   public:
-  TransmRpcSession();
-  bool setConnectionSettings(QString h="127.0.0.1", QString p="9091", QString u="/transmission/rpc");
+  TransmRpcSession(QString h, QString p, QString u);
+  bool setConnectionSettings(QString h, QString p, QString u);
   int openSession();
   void closeSession();
-  bool getTorrentsList(std::vector<unsigned int> ids, std::vector<std::string> fileds);
+  int getTorrentsList(std::vector<unsigned int> ids, std::vector<std::string> fileds);
 
   private:
+  TorrentsList torrentsList;
   QHttp *http;
-  QBuffer *recieved;
+  QBuffer *response;
   QString transmSessionId;
   QByteArray request;
   QString host;
   QString port;
   QString url;
+  QHttpRequestHeader requestHeader;
+  QString requestBody;
+  bool sessionOpened;
 
   private slots:
-  void dataRecieved();
+  void dataReceived();
 
   signals:
   void HttpError(int errorCode);
