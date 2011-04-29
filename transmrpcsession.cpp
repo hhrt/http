@@ -36,13 +36,16 @@ int TransmRpcSession::getTorrentsList(std::vector<unsigned int> ids, std::vector
   unsigned int i;
   for(i=0;i<fields.size()-1;i++) 
     requestBodyTmp << "\"" << fields[i] << "\", ";
-  requestBodyTmp << "\"" << fields[i] << "\" ], ";
-  requestBodyTmp << "\"ids\" : [ ";
-  for(i=0;i<ids.size()-1;i++)
-    requestBodyTmp << ids[i] << ", ";
-  requestBodyTmp << ids[i] << " ] }, ";
+  requestBodyTmp << "\"" << fields[i] << "\" ]";
+  if(!ids.empty()) {
+    requestBodyTmp << ", \"ids\" : [ ";
+    for(i=0;i<ids.size()-1;i++)
+      requestBodyTmp << ids[i] << ", ";
+    requestBodyTmp << ids[i] <<" ]";
+  }
+  requestBodyTmp << " }, ";
   requestBodyTmp << "\"method\" : \"torrent-get\",\n \"tag\" : " << TORRENTSLIST << " }";
-//  qDebug() << "Request: " << requestBodyTmp.str().c_str();
+  //qDebug() << "Request: " << requestBodyTmp.str().c_str(); 
   requestBody->setData(requestBodyTmp.str().c_str());
   //-----------------------
 
@@ -93,7 +96,7 @@ bool TransmRpcSession::parseRequestData() {
 	return false;
   }
 
-  //qDebug() << "Respose: " << response->buffer().data();
+//  qDebug() << "Respose: " << response->buffer().data();
 
   torrentsValue = root["arguments"]["torrents"];
   if(torrentsValue.isNull()) {

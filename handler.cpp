@@ -4,6 +4,7 @@
 #include<iostream>
 #include<string>
 #include<vector>
+#include<iomanip>
 #include "handler.h"
 #include "errorcodes.h"
 #include "transmrpcsession.h"
@@ -26,12 +27,10 @@ Handler::Handler(QStringList args) {
   connect(session, SIGNAL(requestComplete()), this, SLOT(successHandler()));
 
   std::vector<std::string> fields;
-  std::vector<unsigned int> ids;
   fields.push_back("id");
   fields.push_back("name");
   fields.push_back("totalSize");
-  ids.push_back(1);
-  ids.push_back(2);
+  std::vector<unsigned int> ids;
 
   session->getTorrentsList(ids, fields);
 
@@ -62,7 +61,7 @@ void Handler::successHandler() {
   std::cout << "Torrents(" << session->content().torrents()->size() << "):\n";
   unsigned int i;
   for(i=0; i < session->content().torrents()->size(); i++) {
-	std::cout << "ID: " << *(session->content().torrents()->at(i).id());
+	std::cout << "ID: " << std::setw(3) <<*(session->content().torrents()->at(i).id());
 	std::cout << " Name: \"" << *(session->content().torrents()->at(i).name()) << "\"";
 	std::cout << " Size: " << (unsigned int)*(session->content().torrents()->at(i).size()) << "\n";
   }
