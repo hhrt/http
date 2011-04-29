@@ -19,8 +19,6 @@ class TransmRpcSession : public QObject {
   public:
   TransmRpcSession(QString h, QString p, QString u);
   bool setConnectionSettings(QString h, QString p, QString u);
-  int openSession();
-  void closeSession();
   int getTorrentsList(std::vector<unsigned int> ids, std::vector<std::string> fileds);
 
   private:
@@ -34,14 +32,16 @@ class TransmRpcSession : public QObject {
   QString url;
   QHttpRequestHeader requestHeader;
   QString requestBody;
-  bool sessionOpened;
+
+  bool parseRequestData();
 
   private slots:
   void dataReceived();
 
   signals:
-  void HttpError(int errorCode);
-  void receivedTorrentsList(TorrentsList torrentsList);
+  void httpError(int errorCode);
+  void parsingDataError();
+  void requestComplete(); 
 
 };
 

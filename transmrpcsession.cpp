@@ -1,8 +1,8 @@
 #include "transmrpcsession.h"
 #include "json/json.h"
-#include <boost/lexical_cast.hpp>
 #include "tags.h"
 #include <QHttp>
+#include "torrent.h"
 
 TransmRpcSession::TransmRpcSession(QString h = "127.0.0.1", QString p = "9091", QString u = "/transmission/rpc/") {
   host = h;
@@ -23,26 +23,20 @@ TransmRpcSession::setConnectionSettings(QString h = this.Host, QString p = this.
   http->setHost(host, port.toInt());
 };
 
-bool TransmRpcSession::openSession() {
-
-  
-
-  return true;
-
-};
-
-int getTorrentsList(std::vector<unsigned int> ids, std::vector<std::string> fileds){
+int TransmRpcSession::getTorrentsList(std::vector<unsigned int> ids, std::vector<std::string> fileds){
   //json request genereting
-  requestBody = "{ \"arguments\" : { \"fields\" : [ ";
+  std::ostringstream requestBodyTmp;//Fucking std::string doen't concatenates with int!!!
+  requestBodyTmp << "{ \"arguments\" : { \"fields\" : [ ";
   int i;
   for(i=0;i<fields.size()-1;i++) 
-    requestBody = requestBody + "\" " + fields[i] + "\", ";
-  requestBody += fields[i] + "\" ], ";
-  requestBody += "\"ids\" : [ ";
+    requestBodyTmp << "\" " << fields[i] << "\", ";
+  requestBodyTmp << fields[i] << "\" ], ";
+  requestBodyTmp << "\"ids\" : [ ";
   for(i=0;i<ids.size()-1;i++)
-    requestBody = requestBody + boost::lexical_cast<std::string>(ids[i]) +", ";
-  requestBody += boost::lexical_cast<std::string>(ids[i]) + " ] }, ";
-  requestBody = requestBody + " }, \"method\" : \"torrent-get\",\n \"tag\" : " + TORRENTSLIST +" }";
+    requestBodyTmp << ids[i] << ", ";
+  requestBodyTmp << ids[i] << " ] }, ";
+  requestBodyTmp << " }, \"method\" : \"torrent-get\",\n \"tag\" : " << TORRENTSLIST << " }";
+  requestBody = requestBodyTmp.str();
   //-----------------------
 
   requestHeader.setRequest("POST", Url);
@@ -51,10 +45,10 @@ int getTorrentsList(std::vector<unsigned int> ids, std::vector<std::string> file
   return http->request(requestHeader, requestBody, response);
 };
 
-void dataReceived(bool error) {
+void TransmRpcSession::dataReceived(bool error) {
   if(error) {
     qDebug() << "Error recieving data!" << http->errorString();
-    emit HttpError(int errorCode);
+    emit httpError(dataRecievingError);
   }
   else {
     switch(http->lastResponse().statusCode()) {
@@ -65,7 +59,50 @@ void dataReceived(bool error) {
 	  response.buffer().clear(); 
 	  http->request(requestHeader, requestBody, response);//check this!!!
 	  break;
+	  case 200:
+	  response.seek(0);
+      if(parseRequestData())
+        emit requestCompete();
+	  else
+		emit parsingDataError();
+	  break;
+	  default:
+	  qDebug << "Response status code: " << http->lastResponse().statusCode();
+	  response.close();
+	  response.buffer().clear();
+	  emit httpError(connectionError);
 
 	}
   };
+};
+
+bool TransmRpcSession::parseRequestData() {
+
+  Json::reader reader;
+  Json::Value root;  
+  Json::Value torrentsValue;
+
+  if(!reader.parse(response.toAscii().data(), root)) {
+	qDebug << "Error parsong JSON data!";
+	return false;
+  }
+
+  torrentsValue = root["arguments"]["torrents"];
+  if(torrentsValue.isNull()) {
+	qDebug << "Request doesn't contains 'torretns' part!";
+	return false;
+  }
+
+  Torrent *torrent;
+
+  *torrentsList.result() = root.get("result", "none").asString();
+  *torrentsList.tag() = root.get("tag", "0").asUInt();
+
+  unsigned int i;
+  for(i=0;i<torrentsValue.size();i++) {
+    torrent = new Torrent(torrentValue[i]);
+	torrentsList.torrents()->push_back(*torrent);
+	delete torrent;
+  }
+  return true;
 };
