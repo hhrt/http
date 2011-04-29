@@ -2,15 +2,16 @@
 #define TRANSMRPCSESSION
 
 #include<QObject>
+#include<QHttp>
 #include<string>
 #include<vector>
-
+#include "torrent.h"
 #include "errorcodes.h"
 
-class QHttp;
 class QBuffer;
 class QString;
 class TorrentsList;
+
 
 class TransmRpcSession : public QObject {
 
@@ -18,8 +19,9 @@ class TransmRpcSession : public QObject {
 
   public:
   TransmRpcSession(QString h, QString p, QString u);
-  bool setConnectionSettings(QString h, QString p, QString u);
+  void setConnectionSettings(QString h, QString p, QString u);
   int getTorrentsList(std::vector<unsigned int> ids, std::vector<std::string> fileds);
+  TorrentsList content() const;
 
   private:
   TorrentsList torrentsList;
@@ -31,16 +33,15 @@ class TransmRpcSession : public QObject {
   QString port;
   QString url;
   QHttpRequestHeader requestHeader;
-  QString requestBody;
+  QBuffer *requestBody;
 
   bool parseRequestData();
 
   private slots:
-  void dataReceived();
+  void dataReceived(bool error);
 
   signals:
-  void httpError(int errorCode);
-  void parsingDataError();
+  void errorSignal(int errorCode);
   void requestComplete(); 
 
 };

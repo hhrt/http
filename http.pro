@@ -8,8 +8,8 @@ DEPENDPATH += .
 INCLUDEPATH += .
 
 # Input
-HEADERS += errorcodes.h httpapp.h httpposter.h ./include/json/*.h torrent.h
-SOURCES += httpapp.cpp httpposter.cpp main.cpp ./lib/*.cpp torrent.cpp
+HEADERS += errorcodes.h handler.h transmrpcsession.h ./include/json/*.h torrent.h
+SOURCES += handler.cpp transmrpcsession.cpp  main.cpp ./lib/*.cpp torrent.cpp
 
 QT += network
 

@@ -1,7 +1,0 @@
-{
-  "arguments" : {
-	"fields" : [ "id", "name", "totalSize" ]
-	}, 
-  "method" : "torrent-get", 
-  "tag" : 99999
-}

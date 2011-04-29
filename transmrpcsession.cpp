@@ -3,93 +3,101 @@
 #include "tags.h"
 #include <QHttp>
 #include "torrent.h"
+#include <QBuffer>
+#include<sstream>
+#include<QDebug>
 
 TransmRpcSession::TransmRpcSession(QString h = "127.0.0.1", QString p = "9091", QString u = "/transmission/rpc/") {
-  host = h;
-  port = p;
-  url = u;
+  if(h != NULL) host = h;
+  else host = "127.0.0.1";
+  if(p != NULL) port = p;
+  else port = "9091";
+  if(u != NULL) url = u;
+  else url = "/transmission/rpc/";
   http = new QHttp();
-  connect(http, SIGNAL(done(bool)), thism SLOT(dataRecieved(bool)));
-  received = new QBuffer;
+  connect(http, SIGNAL(done(bool)), this, SLOT(dataReceived(bool)));
+  response = new QBuffer;
+  requestBody = new QBuffer;
   transmSessionId = "";
   http->setHost(host, port.toInt());
-  sessionOpened = false;
 };
 
-TransmRpcSession::setConnectionSettings(QString h = this.Host, QString p = this.Port, QString u = this.Url) {
-  host = h;
-  port = p;
-  url = u;
+void TransmRpcSession::setConnectionSettings(QString h = NULL, QString p = NULL, QString u = NULL) {
+  if(h != NULL) host = h;
+  if(p != NULL) port = p;
+  if(u != NULL) url = u;
   http->setHost(host, port.toInt());
 };
 
-int TransmRpcSession::getTorrentsList(std::vector<unsigned int> ids, std::vector<std::string> fileds){
+int TransmRpcSession::getTorrentsList(std::vector<unsigned int> ids, std::vector<std::string> fields){
   //json request genereting
   std::ostringstream requestBodyTmp;//Fucking std::string doen't concatenates with int!!!
   requestBodyTmp << "{ \"arguments\" : { \"fields\" : [ ";
-  int i;
+  unsigned int i;
   for(i=0;i<fields.size()-1;i++) 
-    requestBodyTmp << "\" " << fields[i] << "\", ";
-  requestBodyTmp << fields[i] << "\" ], ";
+    requestBodyTmp << "\"" << fields[i] << "\", ";
+  requestBodyTmp << "\"" << fields[i] << "\" ], ";
   requestBodyTmp << "\"ids\" : [ ";
   for(i=0;i<ids.size()-1;i++)
     requestBodyTmp << ids[i] << ", ";
   requestBodyTmp << ids[i] << " ] }, ";
-  requestBodyTmp << " }, \"method\" : \"torrent-get\",\n \"tag\" : " << TORRENTSLIST << " }";
-  requestBody = requestBodyTmp.str();
+  requestBodyTmp << "\"method\" : \"torrent-get\",\n \"tag\" : " << TORRENTSLIST << " }";
+//  qDebug() << "Request: " << requestBodyTmp.str().c_str();
+  requestBody->setData(requestBodyTmp.str().c_str());
   //-----------------------
 
-  requestHeader.setRequest("POST", Url);
-  requestHeader.setValue(Host, Port);
-  requestHeader.setValue("X-Transmission-Session-Id", transmissionSessionId);
+  requestHeader.setRequest("POST", url);
+  requestHeader.setValue(host, port);
+  requestHeader.setValue("X-Transmission-Session-Id", transmSessionId);
   return http->request(requestHeader, requestBody, response);
 };
 
 void TransmRpcSession::dataReceived(bool error) {
   if(error) {
     qDebug() << "Error recieving data!" << http->errorString();
-    emit httpError(dataRecievingError);
+    emit errorSignal(dataRecievingError);
   }
   else {
     switch(http->lastResponse().statusCode()) {
       case 409:
-	  transmissionSessionId = http->lastResponse().value("X-Transmission-Session-Id");
-	  requestHeader.setValue("X-Transmission-Session-Id", transmissionSessionId);
-	  response.close();
-	  response.buffer().clear(); 
+	  transmSessionId = http->lastResponse().value("X-Transmission-Session-Id");
+	  requestHeader.setValue("X-Transmission-Session-Id", transmSessionId);
+	  response->close();
+	  response->buffer().clear(); 
 	  http->request(requestHeader, requestBody, response);//check this!!!
 	  break;
 	  case 200:
-	  response.seek(0);
+	  response->seek(0);
       if(parseRequestData())
-        emit requestCompete();
+        emit requestComplete();
 	  else
-		emit parsingDataError();
+		emit errorSignal(parsingError);
 	  break;
 	  default:
-	  qDebug << "Response status code: " << http->lastResponse().statusCode();
-	  response.close();
-	  response.buffer().clear();
-	  emit httpError(connectionError);
-
+	  qDebug() << "Response status code: " << http->lastResponse().statusCode();
+	  response->close();
+	  response->buffer().clear();
+	  emit errorSignal(connectionError);
 	}
   };
 };
 
 bool TransmRpcSession::parseRequestData() {
 
-  Json::reader reader;
+  Json::Reader reader;
   Json::Value root;  
   Json::Value torrentsValue;
 
-  if(!reader.parse(response.toAscii().data(), root)) {
-	qDebug << "Error parsong JSON data!";
+  if(!reader.parse(response->buffer().data(), root)) {
+	qDebug() << "Error parsong JSON data!";
 	return false;
   }
 
+  //qDebug() << "Respose: " << response->buffer().data();
+
   torrentsValue = root["arguments"]["torrents"];
   if(torrentsValue.isNull()) {
-	qDebug << "Request doesn't contains 'torretns' part!";
+	qDebug() << "Request doesn't contains 'torretns' part!";
 	return false;
   }
 
@@ -100,9 +108,13 @@ bool TransmRpcSession::parseRequestData() {
 
   unsigned int i;
   for(i=0;i<torrentsValue.size();i++) {
-    torrent = new Torrent(torrentValue[i]);
+    torrent = new Torrent(torrentsValue[i]);
 	torrentsList.torrents()->push_back(*torrent);
 	delete torrent;
   }
   return true;
+};
+
+TorrentsList TransmRpcSession::content() const {
+  return torrentsList;
 };
