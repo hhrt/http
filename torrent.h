@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <json/json.h>
+#include <ctime>
 
 class Torrent {
 
@@ -15,9 +16,9 @@ class Torrent {
   Torrent(int i, double s, std::string n);
   Torrent(Json::Value j);
   Torrent();
-  int *id();
-  double *size();
-  std::string *name();
+  int id();
+  std::string size();
+  std::string name();
 
   void set_id(int i);
   void set_size(double s);

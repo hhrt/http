@@ -29,17 +29,17 @@ void TransmRpcSession::setConnectionSettings(QString h = NULL, QString p = NULL,
   http->setHost(host, port.toInt());
 };
 
-int TransmRpcSession::getTorrentsList(std::vector<unsigned int> ids, std::vector<std::string> fields){
+int TransmRpcSession::getTorrentsList(std::vector<std::string> fields, unsigned int *ids){
   //json request genereting
-  std::ostringstream requestBodyTmp;//Fucking std::string doen't concatenates with int!!!
+  std::ostringstream requestBodyTmp;//Fucking std::string doesn't concatenates with int!!!
   requestBodyTmp << "{ \"arguments\" : { \"fields\" : [ ";
   unsigned int i;
   for(i=0;i<fields.size()-1;i++) 
     requestBodyTmp << "\"" << fields[i] << "\", ";
   requestBodyTmp << "\"" << fields[i] << "\" ]";
-  if(!ids.empty()) {
+  if(ids != NULL) {
     requestBodyTmp << ", \"ids\" : [ ";
-    for(i=0;i<ids.size()-1;i++)
+    for(i=0;i<(sizeof(ids)/sizeof(int))-1;i++)
       requestBodyTmp << ids[i] << ", ";
     requestBodyTmp << ids[i] <<" ]";
   }

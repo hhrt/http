@@ -1,4 +1,7 @@
 #include "torrent.h"
+#include <sstream>
+#include <iomanip>
+#include <ctime>
 
 Torrent::Torrent( int i, double s, std::string n) {
   Id = i;
@@ -20,16 +23,25 @@ Torrent::Torrent(Json::Value j) {
 
 }
 
-int *Torrent::id(){
-  return &Id;
+int Torrent::id(){
+  return Id;
 };
 
-double *Torrent::size(){
-  return &Size;
+std::string Torrent::size(){
+  std::ostringstream out;
+
+  if((Size >1000) && (Size <1000000)) 
+	out << std::setprecision(3) << (double)(Size/1024) << "Kb";
+  if((Size >1000000) && (Size <1000000000)) 
+	out << std::setprecision(3) << (double)(Size/1024/1024) << "Mb";
+  if(Size >1000000000) 
+	out << std::setprecision(3) << (double)(Size/1024/1024/1024) << "Gb";
+
+  return out.str();
 };
 
-std::string *Torrent::name(){
-  return &Name;
+std::string Torrent::name(){
+  return Name;
 };
 
 void Torrent::set_id(int i) {
@@ -44,12 +56,13 @@ void Torrent::set_name(std::string n) {
   Name = n;
 };
 
+
 bool Torrent::operator==(Torrent b) {
-  return Id == *b.id();
+  return Id == b.id();
 };
 
 bool Torrent::operator<(Torrent b) {
-  return Id < *b.id();
+  return Id < b.id();
 };
 
 TorrentsList::TorrentsList(std::string r, unsigned int t) {

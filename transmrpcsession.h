@@ -20,7 +20,7 @@ class TransmRpcSession : public QObject {
   public:
   TransmRpcSession(QString h, QString p, QString u);
   void setConnectionSettings(QString h, QString p, QString u);
-  int getTorrentsList(std::vector<unsigned int> ids, std::vector<std::string> fileds);
+  int getTorrentsList(std::vector<std::string> fileds, unsigned int *ids = NULL);
   TorrentsList content() const;
 
   private:

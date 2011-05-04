@@ -30,9 +30,9 @@ Handler::Handler(QStringList args) {
   fields.push_back("id");
   fields.push_back("name");
   fields.push_back("totalSize");
-  std::vector<unsigned int> ids;
+  unsigned int ids[] = {2, 1};
 
-  session->getTorrentsList(ids, fields);
+  session->getTorrentsList(fields, ids);
 
 };
 
@@ -56,14 +56,17 @@ void Handler::errorHandler(int errorCode) {
 
 void Handler::successHandler() {
 
-  std::cout << "Result     :" << *(session->content().result()) << "\n"; 
-  std::cout << "Tag        :" << *(session->content().tag()) << "\n";
+  std::cout << "Result     : " << *(session->content().result()) << "\n"; 
+  std::cout << "Tag        : " << *(session->content().tag()) << "\n";
   std::cout << "Torrents(" << session->content().torrents()->size() << "):\n";
   unsigned int i;
+  unsigned int size = 5;
+  for(i=0;i < session->content().torrents()->size(); i++) 
+	size = size < session->content().torrents()->at(i).name().length() ? session->content().torrents()->at(i).name().length() : size;
   for(i=0; i < session->content().torrents()->size(); i++) {
-	std::cout << "ID: " << std::setw(3) <<*(session->content().torrents()->at(i).id());
-	std::cout << " Name: \"" << *(session->content().torrents()->at(i).name()) << "\"";
-	std::cout << " Size: " << (unsigned int)*(session->content().torrents()->at(i).size()) << "\n";
+   std::cout << "ID: " << std::setw(3) << std::right << session->content().torrents()->at(i).id();
+   std::cout << std::left << " Name: " << std::setw(size+2) << ("\"" + session->content().torrents()->at(i).name() + "\"");
+   std::cout << " Size: " <<  std::setw(6) << std::right << session->content().torrents()->at(i).size() << "\n";
   }
   exit(0);
 };
